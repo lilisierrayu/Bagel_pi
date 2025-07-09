@@ -1,17 +1,27 @@
 #!/bin/bash
 #SBATCH --cpus-per-task=11
-#SBATCH --error=/mnt/weka/slurm_logs/liliyu/img_edit_train/%j_%a_log.err
+#SBATCH --error=/mnt/weka/slurm_logs/lucy/img_edit_train/%j_%a_log.err
 #SBATCH --gres=gpu:8
 #SBATCH --nodes=2
 #SBATCH --ntasks-per-node=1
 #SBATCH --open-mode=append
-#SBATCH --output=/mnt/weka/slurm_logs/liliyu/img_edit_train/%j_%a_log.out
+#SBATCH --output=/mnt/weka/slurm_logs/lucy/img_edit_train/%j_%a_log.out
 #SBATCH --signal=USR2@90
 #SBATCH --wckey=submitit
 #SBATCH --qos=hl
 #SBATCH --job-name=all_robots
 
-cd /home/liliyu/workspace/BAGEL
+# Check if config name is provided
+if [ $# -eq 0 ]; then
+    echo "Usage: $0 <config_name>"
+    echo "Example: $0 seedp1_0.2_arx_biarm_allview_endspan"
+    exit 1
+fi
+
+# Get config name from command line argument
+config_name=$1
+
+cd /home/lucy/Bagel_pi
 source .venv/bin/activate
 
 # replace the variables with your own
@@ -25,7 +35,7 @@ GPUS=8
 
 batch_size=1
 seq_len=16384
-export PYTHONPATH=/home/liliyu/workspace/BAGEL
+export PYTHONPATH=/home/lucy/Bagel_pi
 total_gpus=$((num_nodes * GPUS))
 
 # Fine-tuning
@@ -46,8 +56,8 @@ srun torchrun --nnodes=$SLURM_NNODES --nproc_per_node=8 \
   --max_num_tokens $seq_len \
   --max_num_tokens_per_sample $seq_len \
   --batch_size $batch_size \
-  --dataset_config_file data/configs/seedp1_0.2_static_mobile_allview_endspan.yaml  \
-  --exp_name pi_static_mobile_allview_endspan_seedp1_gpu${total_gpus}_seq${seq_len} \
+  --dataset_config_file data/configs/${config_name}.yaml  \
+  --exp_name ${config_name}_gpu${total_gpus}_seq${seq_len} \
   --wandb_runid 0 \
   --num_shard $total_gpus \
   --use_flex True \
