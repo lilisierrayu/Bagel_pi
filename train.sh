@@ -2,14 +2,14 @@
 #SBATCH --cpus-per-task=11
 #SBATCH --error=/mnt/weka/slurm_logs/lucy/img_edit_train/%j_%a_log.err
 #SBATCH --gres=gpu:8
-#SBATCH --nodes=2
+#SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --open-mode=append
 #SBATCH --output=/mnt/weka/slurm_logs/lucy/img_edit_train/%j_%a_log.out
 #SBATCH --signal=USR2@90
 #SBATCH --wckey=submitit
-#SBATCH --qos=hl
-#SBATCH --job-name=all_robots
+#SBATCH --job-name=bagel
+#SBATCH --qos=high
 
 # Check if config name is provided
 if [ $# -eq 0 ]; then
@@ -21,15 +21,18 @@ fi
 # Get config name from command line argument
 config_name=$1
 
+# Rename the job to use the config name
+scontrol update job $SLURM_JOB_ID name=$config_name
+
 cd /home/lucy/Bagel_pi
 source .venv/bin/activate
 
 # replace the variables with your own
 # Fine-tuning
-num_nodes=2
-node_rank=0
+num_nodes=$SLURM_NNODES
+node_rank=$SLURM_NODEID
 master_addr=localhost
-master_port=29500
+master_port=29510
 resume_from=/home/liliyu/workspace/BAGEL/pretrained_models/BAGEL-7B-MoT
 GPUS=8
 
@@ -40,7 +43,7 @@ total_gpus=$((num_nodes * GPUS))
 
 # Fine-tuning
 srun torchrun --nnodes=$num_nodes --nproc_per_node=$GPUS \
-    --rdzv_id=$SLURM_JOB_ID --rdzv_backend=c10d --rdzv_endpoint=$HOSTNAME:29501  train/pretrain_unified_navit.py \
+    --rdzv_id=$SLURM_JOB_ID --rdzv_backend=c10d --rdzv_endpoint=$HOSTNAME:$master_port  train/pretrain_unified_navit.py \
   --layer_module Qwen2MoTDecoderLayer \
   --model_path $resume_from \
   --resume-from $resume_from \
