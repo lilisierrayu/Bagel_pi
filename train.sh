@@ -2,14 +2,14 @@
 #SBATCH --cpus-per-task=11
 #SBATCH --error=/mnt/weka/slurm_logs/lucy/img_edit_train/%j_%a_log.err
 #SBATCH --gres=gpu:8
-#SBATCH --nodes=1
+#SBATCH --nodes=2
 #SBATCH --ntasks-per-node=1
 #SBATCH --open-mode=append
 #SBATCH --output=/mnt/weka/slurm_logs/lucy/img_edit_train/%j_%a_log.out
 #SBATCH --signal=USR2@90
 #SBATCH --wckey=submitit
 #SBATCH --job-name=bagel
-#SBATCH --qos=hl
+###SBATCH --qos=hl
 ###SBATCH --qos=high
 
 # Check if config name is provided
