@@ -9,7 +9,8 @@
 #SBATCH --signal=USR2@90
 #SBATCH --wckey=submitit
 #SBATCH --job-name=bagel
-#SBATCH --qos=high
+#SBATCH --qos=hl
+###SBATCH --qos=high
 
 # Check if config name is provided
 if [ $# -eq 0 ]; then
@@ -22,7 +23,7 @@ fi
 config_name=$1
 
 # Rename the job to use the config name
-scontrol update job $SLURM_JOB_ID name=$config_name
+scontrol update job $SLURM_JOB_ID name=bagel_$config_name
 
 cd /home/lucy/Bagel_pi
 source .venv/bin/activate
