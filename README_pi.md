@@ -1,6 +1,6 @@
 # Installation
 ```bash
-uv venv --python 3.10 bagel
+uv venv --python 3.11.9 # from monopi
 source bagel/bin/activate
 uv pip install -r pi_requirements.txt
 uv pip install -r requirements.txt
