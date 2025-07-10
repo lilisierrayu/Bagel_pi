@@ -39,7 +39,7 @@ export PYTHONPATH=/home/lucy/Bagel_pi
 total_gpus=$((num_nodes * GPUS))
 
 # Fine-tuning
-srun torchrun --nnodes=$SLURM_NNODES --nproc_per_node=8 \
+srun torchrun --nnodes=$num_nodes --nproc_per_node=$GPUS \
     --rdzv_id=$SLURM_JOB_ID --rdzv_backend=c10d --rdzv_endpoint=$HOSTNAME:29501  train/pretrain_unified_navit.py \
   --layer_module Qwen2MoTDecoderLayer \
   --model_path $resume_from \
