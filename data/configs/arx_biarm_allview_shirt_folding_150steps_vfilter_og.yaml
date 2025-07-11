@@ -19,7 +19,7 @@ simple_edit:
 pi_edit_allviews:
   dataset_names:
   - arx_endspan_224  # Set pi data name for tracking
-  pi_config_name: policy_shirt_folding_mc_filtered_quality_scaled_vf_future_prediction  # Set pi data here 
+  pi_config_name: policy_shirt_folding_mc_filtered_quality_scaled_vf_future_prediction_og  # Set pi data here 
   image_keys: "image_0,image_2,image_3"
   image_transform_args:
     image_stride: 16

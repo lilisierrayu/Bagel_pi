@@ -9,7 +9,7 @@
 #SBATCH --signal=USR2@90
 #SBATCH --wckey=submitit
 #SBATCH --job-name=bagel
-###SBATCH --qos=hl
+#SBATCH --qos=hl
 ###SBATCH --qos=high
 
 # Check if config name is provided
