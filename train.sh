@@ -9,8 +9,6 @@
 #SBATCH --signal=USR2@90
 #SBATCH --wckey=submitit
 #SBATCH --job-name=bagel
-#SBATCH --qos=hl
-###SBATCH --qos=high
 
 # Check if config name is provided
 if [ $# -eq 0 ]; then
@@ -35,6 +33,7 @@ node_rank=$SLURM_NODEID
 master_addr=localhost
 master_port=29510
 resume_from=/home/liliyu/workspace/BAGEL/pretrained_models/BAGEL-7B-MoT
+ckpt_dir=/mnt/weka/checkpoints/lucy/bagel_ckpt/
 GPUS=8
 
 batch_size=1
@@ -52,6 +51,8 @@ srun torchrun --nnodes=$num_nodes --nproc_per_node=$GPUS \
   --finetune_from_hf True \
   --auto_resume True \
   --resume-model-only True \
+  --exp_checkpoint_dir $ckpt_dir \
+  --checkpoint_dir $ckpt_dir \
   --finetune-from-ema True \
   --log_every 1 \
   --lr 2e-5 \
