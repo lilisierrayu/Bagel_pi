@@ -31,7 +31,7 @@ source .venv/bin/activate
 num_nodes=$SLURM_NNODES
 node_rank=$SLURM_NODEID
 master_addr=localhost
-master_port=29510
+master_port=29503
 resume_from=/home/liliyu/workspace/BAGEL/pretrained_models/BAGEL-7B-MoT
 ckpt_dir=/mnt/weka/checkpoints/lucy/bagel_ckpt/
 GPUS=8

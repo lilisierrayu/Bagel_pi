@@ -251,7 +251,23 @@ async def main(args):
     inferencer = prepare_model(args.weights_path, args.mode)
     image_keys = [x.strip() for x in args.image_key_str.split(",")]
     print(f"inferencing with image keys: {image_keys}")
-    image_dir = f"generated_images/{args.image_save_dir}"
+    
+    image_dir = "generated_images/"
+    # Extract image_dir from weights_path if image_save_dir is not provided
+    if args.image_save_dir is None:  # No value provided
+        # Extract the last two parts of the path and join them
+        weights_path_parts = args.weights_path.rstrip('/').split('/')
+        if len(weights_path_parts) >= 2:
+            # Get the second-to-last and last parts
+            model_name = weights_path_parts[-2]
+            checkpoint_name = weights_path_parts[-1]
+            image_dir += f"{model_name}_{checkpoint_name}"
+        else:
+            # Fallback if path structure is unexpected
+            image_dir += f"{args.weights_path.replace('/', '_').replace(':', '_')}"
+    else:
+        image_dir += f"{args.image_save_dir}"
+    
     os.makedirs(image_dir, exist_ok=True)
     print(f"generated images will be saved at: {image_dir}")
 
@@ -264,7 +280,7 @@ if __name__ == "__main__":
     parser.add_argument("--weights_path", type=str, default="/data/bagel_ckpts/pi_ur5e4_endspan_lange_seedp1_gpu8_seq16384/0040000/")
     parser.add_argument("--mode", type=int, default=1)
     parser.add_argument("--image_key_str", type=str, default="image_0,image_2_ur5")
-    parser.add_argument("--image_save_dir", type=str, default="port_8000")
+    parser.add_argument("--image_save_dir", type=str)
     parser.add_argument("--n_timesteps", type=int, default=25)
     parser.add_argument("--port", type=int, default=8000)
     args = parser.parse_args()
