@@ -6,37 +6,21 @@ set -x
 model_path=/home/liliyu/workspace/BAGEL/pretrained_models/BAGEL-small-fake
 model_path=/home/liliyu/workspace/BAGEL/pretrained_models/BAGEL-7B-MoT
 
-root_dir=/home/liliyu/workspace/BAGEL/results
+root_dir=/mnt/weka/checkpoints/lucy/bagel_ckpt
 
 GPUS=8
 
 
-exp_names=(
-    pi_arxbiarm_3views_independent_seedp1_gpu8_seq16384
-)
-task_name='arx_biarm_endspan'
-# task_name='arx_biarm_100steps'
-
 
 exp_names=(
-    pi_arxs_ur5_allview_seq_seedp1_gpu16_seq16384   
+    arx_biarm_allview_shirt_folding_150steps_gpu16_seq16384
 )
-task_names=('arx_biarm_endspan_lang' 'ur5e4_endspan_lang' 'arx_endspan_lang')
-
-
-
-exp_names=(
-    pi_h1g1_allview_seq_seedp1_gpu16_seq16384   
-)
-task_names=(g1h1_endspan)
-image_list_str="image_0,image_2,image_3"
-
-
+task_name='shirt_folding_150steps'
 
 
 # while true; do
 for mode in raw ema; do
-    for task_name in "${task_names[@]}"; do
+    # for task_name in "${task_names[@]}"; do
         for exp_name in "${exp_names[@]}"; do
             if [[ $exp_name == *"448"* ]]; then
                 resolution=448
@@ -77,7 +61,7 @@ for mode in raw ema; do
                     done
             done
         done
-    done
+    # done
 done
 #     echo "rest"
 #     sleep 1h

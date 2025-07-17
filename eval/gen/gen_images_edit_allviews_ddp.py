@@ -58,7 +58,7 @@ def setup_distributed():
     torch.cuda.set_device(int(os.environ["LOCAL_RANK"]))
 
 
-DATA_DIR = "/home/liliyu/workspace/monopi/monopi/experimental/liliyu/export_wm/"
+DATA_DIR = "/home/lucy/monopi/monopi/experimental/lucy/export_wm/"
 
 
 def setup_model(model_path, 
@@ -109,7 +109,7 @@ def setup_model(model_path,
         if args.checkpoint_step == "-1":
             weight_path = args.model_path
         else:
-            weight_path = os.path.join("results", args.run_name, "checkpoints", args.checkpoint_step)
+            weight_path = os.path.join("/mnt/weka/checkpoints/lucy/bagel_ckpt", args.run_name, "checkpoints", args.checkpoint_step)
         if args.model_mode == "ema":
             model_state_dict_path = os.path.join(weight_path, "ema.safetensors")
         elif args.model_mode == "raw":
@@ -148,7 +148,7 @@ def set_seed(seed):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate images using Bagel model.")
-    # parser.add_argument("--metadata_file", type=str, default="/home/liliyu/workspace/monopi/monopi/experimental/liliyu/export_wm/arx_leftarm/image_0/prompts.jsonl", help="JSONL file containing lines of metadata for each prompt.")
+    # parser.add_argument("--metadata_file", type=str, default="/home/lucy/workspace/monopi/monopi/experimental/lucy/export_wm/arx_leftarm/image_0/prompts.jsonl", help="JSONL file containing lines of metadata for each prompt.")
     parser.add_argument("--task_name", type=str, default="arx_step100")
     parser.add_argument("--image_key", type=str, default="all_views")
     parser.add_argument("--image_list_str", type=str, default="image_0,image_2")
@@ -157,7 +157,7 @@ if __name__ == "__main__":
     parser.add_argument("--cfg_scale", type=float, default=1)
     parser.add_argument("--resolution", type=int, default=1024)
     parser.add_argument("--max_latent_size", type=int, default=64)
-    parser.add_argument('--model-path', type=str, default='/home/liliyu/workspace/BAGEL/pretrained_models/BAGEL-7B-MoT')
+    parser.add_argument('--model-path', type=str, default='/home/lucy/workspace/BAGEL/pretrained_models/BAGEL-7B-MoT')
     parser.add_argument('--checkpoint_step', type=str, default='-1')
     parser.add_argument('--run_name', type=str, default='SEED_part23_run0')
     parser.add_argument('--model_mode', type=str, default='ema')
@@ -219,7 +219,7 @@ if __name__ == "__main__":
     ################################################################
     # Set up output directory
     ################################################################
-    output_dir = os.path.join("results", args.run_name, "editing_eval", args.checkpoint_step)
+    output_dir = os.path.join("/mnt/weka/checkpoints/lucy/bagel_ckpt", args.run_name, "editing_eval", args.checkpoint_step)
 
     gen_suffix = (f"renorm{inference_hyper['cfg_renorm_min']}_"
                  f"text{inference_hyper['cfg_text_scale']}_"

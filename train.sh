@@ -9,6 +9,7 @@
 #SBATCH --signal=USR2@90
 #SBATCH --wckey=submitit
 #SBATCH --job-name=bagel
+#SBATCH --qos=hl
 
 # Check if config name is provided
 if [ $# -eq 0 ]; then
@@ -31,7 +32,7 @@ source .venv/bin/activate
 num_nodes=$SLURM_NNODES
 node_rank=$SLURM_NODEID
 master_addr=localhost
-master_port=29503
+master_port=29510
 resume_from=/home/liliyu/workspace/BAGEL/pretrained_models/BAGEL-7B-MoT
 ckpt_dir=/mnt/weka/checkpoints/lucy/bagel_ckpt/
 GPUS=8
