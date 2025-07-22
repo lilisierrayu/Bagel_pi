@@ -9,7 +9,6 @@
 #SBATCH --signal=USR2@90
 #SBATCH --wckey=submitit
 #SBATCH --job-name=bagel
-#SBATCH --qos=hl
 
 # Check if config name is provided
 if [ $# -eq 0 ]; then
@@ -32,8 +31,9 @@ source .venv/bin/activate
 num_nodes=$SLURM_NNODES
 node_rank=$SLURM_NODEID
 master_addr=localhost
-master_port=29510
-resume_from=/home/liliyu/workspace/BAGEL/pretrained_models/BAGEL-7B-MoT
+master_port=29515
+model_path=/home/liliyu/workspace/BAGEL/pretrained_models/BAGEL-7B-MoT
+resume_from=/mnt/weka/checkpoints/liliyu/pi_arxs_ur5_allview_endspan_nolast50_seedp1_gpu16_seq16384/0040000
 ckpt_dir=/mnt/weka/checkpoints/lucy/bagel_ckpt/
 GPUS=8
 
@@ -46,15 +46,15 @@ total_gpus=$((num_nodes * GPUS))
 srun torchrun --nnodes=$num_nodes --nproc_per_node=$GPUS \
     --rdzv_id=$SLURM_JOB_ID --rdzv_backend=c10d --rdzv_endpoint=$HOSTNAME:$master_port  train/pretrain_unified_navit.py \
   --layer_module Qwen2MoTDecoderLayer \
-  --model_path $resume_from \
-  --resume-from $resume_from \
+  --model_path $model_path \
+  --resume_from $resume_from \
   --max_latent_size 64 \
   --finetune_from_hf True \
   --auto_resume True \
   --resume-model-only True \
   --exp_checkpoint_dir $ckpt_dir \
   --checkpoint_dir $ckpt_dir \
-  --finetune-from-ema True \
+  --finetune-from-ema False \
   --log_every 1 \
   --lr 2e-5 \
   --num_worker 1 \
