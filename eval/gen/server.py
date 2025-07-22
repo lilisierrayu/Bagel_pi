@@ -1,5 +1,7 @@
 """
 PYTHONPATH=. python eval/gen/server.py  --weights_path /data/bagel_ckpts/pi_arx_biarm_allview_seq_seedp1_gpu16_seq16384/0050000/  --image_save_dir diverse_batch_folding   --image_key_str image_0,image_2,image_3
+
+PYTHONPATH=. python eval/gen/server.py  --weights_path /data/bagel_ckpts/pi_arxs_ur5_allview_seq_seedp1_gpu16_seq16384/0030000/  --image_save_dir arx_bussing_3k   --image_key_str image_0,image_2,image_3 
 """
 
 import numpy as np
@@ -37,6 +39,28 @@ from msgpack_numpy import Packer, unpackb
 logger = logging.getLogger(__name__)
 PRETRAINED_PATH = "pretrained_models/BAGEL-7B-MoT"
 model_path = PRETRAINED_PATH
+
+
+def _resize_with_pad_pil(image: Image.Image, height: int, width: int, method: int) -> Image.Image:
+    """Replicates tf.image.resize_with_pad for one image using PIL. Resizes an image to a target height and
+    width without distortion by padding with zeros.
+    Unlike the jax version, note that PIL uses [width, height, channel] ordering instead of [batch, h, w, c].
+    """
+    cur_width, cur_height = image.size
+    if cur_width == width and cur_height == height:
+        return image  # No need to resize if the image is already the correct size.
+
+    ratio = max(cur_width / width, cur_height / height)
+    resized_height = int(cur_height / ratio)
+    resized_width = int(cur_width / ratio)
+    resized_image = image.resize((resized_width, resized_height), resample=method)
+
+    zero_image = Image.new(resized_image.mode, (width, height), 0)
+    pad_height = max(0, int((height - resized_height) / 2))
+    pad_width = max(0, int((width - resized_width) / 2))
+    zero_image.paste(resized_image, (pad_width, pad_height))
+    assert zero_image.size == (width, height)
+    return zero_image
 
 def prepare_model(weights_path: str, mode: int):
     print(f"Loading model from {weights_path}") 
@@ -142,7 +166,7 @@ def prepare_model(weights_path: str, mode: int):
     else:
         raise NotImplementedError
     
-    print("===================  Model loaded successfully  ==============")
+    print("===================  Model loaded successfully  ==============\n")
 
     # Inferencer Preparing 
     vae_transform = ImageTransform(224, 224, 16)
@@ -179,16 +203,17 @@ image_key_map = {
     "image_0": "observation/base_0_camera/rgb/image",
     "image_1": "observation/base_1_camera/rgb/image",
     "image_2_ur5": "observation/wrist_0_camera/rgb/image",
+    "arx_right": "observation/right_wrist_0_camera/rgb/image",
     "image_2": "observation/left_wrist_0_camera/rgb/image",
     "image_3": "observation/right_wrist_0_camera/rgb/image",
 }
 
 #### SERVER SIDE ####
-async def handler(websocket, inferencer, image_keys, image_dir, n_timesteps):
+async def handler(websocket, inferencer, image_keys, image_dir, n_timesteps, with_condition):
     try:
         logger.info(f"Connection from {websocket.remote_address} opened")
         inference_hyper = dict(
-            cfg_text_scale=5.0,
+            cfg_text_scale=4.0,
             cfg_img_scale=1.2,
             cfg_interval=[0.0, 1.0],
             timestep_shift=3.0,
@@ -196,14 +221,16 @@ async def handler(websocket, inferencer, image_keys, image_dir, n_timesteps):
             cfg_renorm_min=0.0,
             cfg_renorm_type="global",
             image_shapes=(224, 224),
+            with_condition=with_condition,
         )
         def infer(inputs: dict, cfg_text_scale=4.0, cfg_img_scale=1.3) -> dict:
             set_seed(42)
             print(inputs.keys())
             file_count = len([name for name in os.listdir(image_dir) if os.path.isfile(os.path.join(image_dir, name))])
             from datetime import datetime
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")            
             source_images = [Image.fromarray(inputs[image_key_map[x]]) for x in image_keys]
+            source_images = [_resize_with_pad_pil(source_image, 224, 224, Image.Resampling.LANCZOS) for source_image in source_images]
             for i, source_image in enumerate(source_images):
                 source_image.save(f"{image_dir}/{file_count}_source_{i}_{timestamp}.png")
             prompt = inputs['raw_text']
@@ -272,7 +299,7 @@ async def main(args):
     print(f"generated images will be saved at: {image_dir}")
 
     print(f"\n\nStarting WebSocket server on ws://localhost:{args.port}")
-    async with websockets.serve(ft.partial(handler, inferencer=inferencer, image_keys=image_keys, image_dir=image_dir, n_timesteps=args.n_timesteps), "0.0.0.0", args.port, compression=None, max_size=None) as server:
+    async with websockets.serve(ft.partial(handler, inferencer=inferencer, image_keys=image_keys, image_dir=image_dir, n_timesteps=args.n_timesteps, with_condition=args.with_condition), "0.0.0.0", args.port, compression=None, max_size=None) as server:
         await server.wait_closed()  # Run forever
 
 if __name__ == "__main__":
@@ -282,6 +309,7 @@ if __name__ == "__main__":
     parser.add_argument("--image_key_str", type=str, default="image_0,image_2_ur5")
     parser.add_argument("--image_save_dir", type=str)
     parser.add_argument("--n_timesteps", type=int, default=25)
+    parser.add_argument("--with_condition", type=bool, default=False)
     parser.add_argument("--port", type=int, default=8000)
     args = parser.parse_args()
     asyncio.run(main(args))

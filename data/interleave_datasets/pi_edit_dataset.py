@@ -63,6 +63,7 @@ class PiEditIterableDataset(InterleavedBaseIterableDataset):
         num_used_data: list of number of sampled data points for each jsonl
         """
         super().__init__(dataset_name, local_rank, world_size, num_workers)
+        self.dataset_name=dataset_name   
         self.transform = transform
         self.pi_config = pi_config_name
         self.tokenizer = tokenizer
