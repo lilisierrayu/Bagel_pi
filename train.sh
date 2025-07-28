@@ -33,9 +33,10 @@ node_rank=$SLURM_NODEID
 master_addr=localhost
 master_port=29515
 model_path=/home/liliyu/workspace/BAGEL/pretrained_models/BAGEL-7B-MoT
-resume_from=/mnt/weka/checkpoints/liliyu/pi_arxs_ur5_allview_endspan_nolast50_seedp1_gpu16_seq16384/0040000
+resume_from=/mnt/weka/checkpoints/liliyu/bagel_ckpt/seed_blip3o_all_robots_jul19_gpu64_seq16384_shard8_pretraintest/checkpoints/0040000
 ckpt_dir=/mnt/weka/checkpoints/lucy/bagel_ckpt/
 GPUS=8
+note=""
 
 batch_size=1
 seq_len=16384
@@ -63,9 +64,9 @@ srun torchrun --nnodes=$num_nodes --nproc_per_node=$GPUS \
   --max_num_tokens_per_sample $seq_len \
   --batch_size $batch_size \
   --dataset_config_file data/configs/${config_name}.yaml  \
-  --exp_name ${config_name}_gpu${total_gpus}_seq${seq_len} \
+  --exp_name ${config_name}_gpu${total_gpus}_${note} \
   --wandb_runid 0 \
   --num_shard $total_gpus \
   --use_flex True \
   --visual_und False \
-  --save_every 500
+  --save_every 1000
