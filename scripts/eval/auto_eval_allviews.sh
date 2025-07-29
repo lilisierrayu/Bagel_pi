@@ -9,14 +9,24 @@ model_path=/home/liliyu/workspace/BAGEL/pretrained_models/BAGEL-7B-MoT
 root_dir=/mnt/weka/checkpoints/lucy/bagel_ckpt
 
 GPUS=8
+image_list_str="image_0,image_2,image_3"
 
 
+
+# exp_names=(
+#     arx_biarm_allview_shirt_folding_150steps_gpu32_from_pretrained_40k
+# )
+# task_name='shirt_folding_150steps_vfilter'
+
+# exp_names=(
+#     mobile_dishwasher_200steps_gpu16_from_pretrained_lr1e-5_10k
+# )
+# task_name='dishwasher_200steps'
 
 exp_names=(
-    arx_biarm_allview_shirt_folding_150steps_gpu16_seq16384
+    arx_biarm_diverse_batch_200steps_gpu16_
 )
-task_name='shirt_folding_150steps'
-
+task_name='diverse_batch_folding_step200'
 
 # while true; do
 for mode in raw ema; do
@@ -49,7 +59,7 @@ for mode in raw ema; do
                         --node_rank=0 \
                         --nproc_per_node=$GPUS \
                         --master_addr=127.0.0.1 \
-                        --master_port=12345 \
+                        --master_port=12351 \
                         ./eval/gen/gen_images_edit_allviews_ddp.py \
                         --model-path $model_path \
                         --task_name $task_name \

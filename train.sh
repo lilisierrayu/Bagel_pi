@@ -33,10 +33,10 @@ node_rank=$SLURM_NODEID
 master_addr=localhost
 master_port=29515
 model_path=/home/liliyu/workspace/BAGEL/pretrained_models/BAGEL-7B-MoT
-resume_from=/mnt/weka/checkpoints/liliyu/bagel_ckpt/seed_blip3o_all_robots_jul19_gpu64_seq16384_shard8_pretraintest/checkpoints/0040000
+resume_from=/mnt/weka/checkpoints/liliyu/bagel_ckpt/seed_blip3o_all_robots_jul19_gpu64_seq16384_shard8_pretraintest/checkpoints/0020000
 ckpt_dir=/mnt/weka/checkpoints/lucy/bagel_ckpt/
 GPUS=8
-note=""
+note="from_pretrained_20k"
 
 batch_size=1
 seq_len=16384
@@ -57,7 +57,7 @@ srun torchrun --nnodes=$num_nodes --nproc_per_node=$GPUS \
   --checkpoint_dir $ckpt_dir \
   --finetune-from-ema False \
   --log_every 1 \
-  --lr 2e-5 \
+  --lr 1e-5 \
   --num_worker 1 \
   --expected_num_tokens $seq_len \
   --max_num_tokens $seq_len \

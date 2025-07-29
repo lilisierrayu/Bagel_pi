@@ -58,7 +58,7 @@ def setup_distributed():
     torch.cuda.set_device(int(os.environ["LOCAL_RANK"]))
 
 
-DATA_DIR = "/home/lucy/monopi/monopi/experimental/lucy/export_wm/"
+DATA_DIR = "/mnt/weka/artifacts/lucy/export_wm/"
 
 
 def setup_model(model_path, 
