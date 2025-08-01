@@ -14,7 +14,7 @@ image_list_str="image_0,image_2,image_3"
 
 
 # exp_names=(
-#     arx_biarm_allview_shirt_folding_150steps_gpu32_from_pretrained_40k
+#     arx_biarm_allview_shirt_folding_150steps_vfilter_gpu16_seq16384
 # )
 # task_name='shirt_folding_150steps_vfilter'
 
@@ -27,6 +27,11 @@ exp_names=(
     arx_biarm_diverse_batch_200steps_gpu16_
 )
 task_name='diverse_batch_folding_step200'
+
+# exp_names=(
+#     mobile_all_3cam_200steps_gpu16_from_pretrained_20k
+# )
+# task_name='mobile_all_3cam_200steps'
 
 # while true; do
 for mode in raw ema; do
@@ -59,7 +64,7 @@ for mode in raw ema; do
                         --node_rank=0 \
                         --nproc_per_node=$GPUS \
                         --master_addr=127.0.0.1 \
-                        --master_port=12351 \
+                        --master_port=12352 \
                         ./eval/gen/gen_images_edit_allviews_ddp.py \
                         --model-path $model_path \
                         --task_name $task_name \
