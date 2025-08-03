@@ -56,7 +56,7 @@ def create_pi_dataset(
     config: _config.TrainConfig, *, split: str = "train", num_epochs: int = 1, local_rank=0, world_size=1
 ):
     """Creates a PyTorch dataset from a config name."""
-    config.data.return_compressed_images = True
+    config.data.return_compressed_images = False
     # create an dataset
     # experimental_utils.cache_specs(
     #     config.data.task_mixture_config, f"/home/{getpass.getuser()}/cached_specs"
