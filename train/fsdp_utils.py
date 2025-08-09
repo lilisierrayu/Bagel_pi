@@ -72,8 +72,8 @@ def fsdp_wrapper(original_model, fsdp_config, ignored_modules=[]):
         ),
         ignored_modules=ignored_modules,
         mixed_precision=MixedPrecision(
-            param_dtype=torch.bfloat16,
-            reduce_dtype=torch.bfloat16,
+            param_dtype=torch.float,
+            reduce_dtype=torch.float,
             buffer_dtype=torch.bfloat16,
         ),
         device_id=dist.get_rank() % torch.cuda.device_count(),

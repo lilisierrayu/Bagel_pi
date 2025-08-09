@@ -282,10 +282,10 @@ class PackedAttention(Qwen2Attention):
                 # This avoids RuntimeError: "No available kernel" in environments lacking Efficient Attention support.
                 with sdpa_kernel(backends=[SDPBackend.EFFICIENT_ATTENTION, SDPBackend.MATH]):
                     attn_output = scaled_dot_product_attention(
-                        query_states.to(torch.bfloat16).unsqueeze(0), 
-                        key_states.to(torch.bfloat16).unsqueeze(0), 
-                        value_states.to(torch.bfloat16).unsqueeze(0),
-                        attention_mask_per_sample.to(torch.bfloat16).unsqueeze(0),
+                        query_states.to(torch.float).unsqueeze(0), 
+                        key_states.to(torch.float).unsqueeze(0), 
+                        value_states.to(torch.float).unsqueeze(0),
+                        attention_mask_per_sample.to(torch.float).unsqueeze(0),
                     )
                 upacked_attn_output.append(attn_output.squeeze(0))
             packed_attn_output = torch.cat(upacked_attn_output, dim=1)
@@ -333,9 +333,9 @@ class PackedAttention(Qwen2Attention):
             packed_query_states, packed_key_states, packed_cos, packed_sin, unsqueeze_dim=1
         )
 
-        packed_query_states = packed_query_states.to(torch.bfloat16)
-        packed_key_states = packed_key_states.to(torch.bfloat16)
-        packed_value_states = packed_value_states.to(torch.bfloat16)
+        packed_query_states = packed_query_states.to(torch.float)
+        packed_key_states = packed_key_states.to(torch.float)
+        packed_value_states = packed_value_states.to(torch.float)
 
         if past_key_values is not None and past_key_values.key_cache[self.layer_idx] is not None:
             past_key_states = past_key_values.key_cache[self.layer_idx]
@@ -468,10 +468,10 @@ class PackedAttentionMoT(Qwen2Attention):
                 # This avoids RuntimeError: "No available kernel" in environments lacking Efficient Attention support.
                 with sdpa_kernel(backends=[SDPBackend.EFFICIENT_ATTENTION, SDPBackend.MATH]):
                     attn_output = scaled_dot_product_attention(
-                        query_states.to(torch.bfloat16).unsqueeze(0), 
-                        key_states.to(torch.bfloat16).unsqueeze(0), 
-                        value_states.to(torch.bfloat16).unsqueeze(0),
-                        attention_mask_per_sample.to(torch.bfloat16).unsqueeze(0),
+                        query_states.to(torch.float).unsqueeze(0), 
+                        key_states.to(torch.float).unsqueeze(0), 
+                        value_states.to(torch.float).unsqueeze(0),
+                        attention_mask_per_sample.to(torch.float).unsqueeze(0),
                     )
                 upacked_attn_output.append(attn_output.squeeze(0))
             packed_attn_output = torch.cat(upacked_attn_output, dim=1)
@@ -519,7 +519,7 @@ class PackedAttentionMoT(Qwen2Attention):
             packed_query_states = self.q_norm(packed_query_states)
             packed_key_states = self.k_norm(packed_key_states)
         elif mode == 'gen':
-            packed_query_sequence = packed_query_sequence.to(torch.bfloat16)
+            packed_query_sequence = packed_query_sequence.to(torch.float)
             packed_query_states = packed_query_sequence.new_zeros((packed_query_sequence.shape[0], self.num_heads * self.head_dim))
             packed_key_states = packed_query_sequence.new_zeros((packed_query_sequence.shape[0], self.num_key_value_heads * self.head_dim))
             packed_value_states = packed_query_sequence.new_zeros((packed_query_sequence.shape[0], self.num_key_value_heads * self.head_dim))
@@ -553,9 +553,9 @@ class PackedAttentionMoT(Qwen2Attention):
             packed_query_states, packed_key_states, packed_cos, packed_sin, unsqueeze_dim=1
         )
 
-        packed_query_states = packed_query_states.to(torch.bfloat16)
-        packed_key_states = packed_key_states.to(torch.bfloat16)
-        packed_value_states = packed_value_states.to(torch.bfloat16)
+        packed_query_states = packed_query_states.to(torch.float)
+        packed_key_states = packed_key_states.to(torch.float)
+        packed_value_states = packed_value_states.to(torch.float)
 
         if past_key_values is not None and past_key_values.key_cache[self.layer_idx] is not None:
             past_key_states = past_key_values.key_cache[self.layer_idx]
@@ -805,10 +805,10 @@ class Qwen2MoTDecoderLayer(nn.Module):
         elif mode == "gen":
             packed_text_query_sequence = packed_query_sequence[packed_text_indexes]
             packed_vae_query_sequence = packed_query_sequence[packed_vae_token_indexes]
-            packed_text_query_sequence = self.post_attention_layernorm(packed_text_query_sequence).to(torch.bfloat16)
-            packed_vae_query_sequence = self.post_attention_layernorm_moe_gen(packed_vae_query_sequence).to(torch.bfloat16)
+            packed_text_query_sequence = self.post_attention_layernorm(packed_text_query_sequence).to(torch.float)
+            packed_vae_query_sequence = self.post_attention_layernorm_moe_gen(packed_vae_query_sequence).to(torch.float)
 
-            packed_query_sequence_ = torch.zeros_like(packed_query_sequence).to(torch.bfloat16)
+            packed_query_sequence_ = torch.zeros_like(packed_query_sequence).to(torch.float)
             packed_query_sequence_[packed_text_indexes] = self.mlp(packed_text_query_sequence)
             packed_query_sequence_[packed_vae_token_indexes] = self.mlp_moe_gen(packed_vae_query_sequence)
             packed_query_sequence = packed_query_sequence_
@@ -910,7 +910,7 @@ class Qwen2MoEDecoderLayer(nn.Module):
         if mode == "und":
             packed_query_sequence = self.mlp(packed_query_sequence)
         elif mode == "gen":
-            packed_query_sequence_ = torch.zeros_like(packed_query_sequence).to(torch.bfloat16)
+            packed_query_sequence_ = torch.zeros_like(packed_query_sequence).to(torch.float)
             packed_query_sequence_[packed_text_indexes] = self.mlp(packed_query_sequence[packed_text_indexes])
             packed_query_sequence_[packed_vae_token_indexes] = self.mlp_moe_gen(packed_query_sequence[packed_vae_token_indexes])
             packed_query_sequence = packed_query_sequence_

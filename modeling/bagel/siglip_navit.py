@@ -230,9 +230,9 @@ class SiglipFlashAttention2(SiglipAttention):
             key_states = torch.cat([kh, kw], dim=-1)
 
         attn_output = flash_attn_varlen_func(
-            query_states.to(torch.bfloat16),
-            key_states.to(torch.bfloat16),
-            value_states.to(torch.bfloat16),
+            query_states.to(torch.float),
+            key_states.to(torch.float),
+            value_states.to(torch.float),
             cu_seqlens_q=cu_seqlens,
             cu_seqlens_k=cu_seqlens,
             max_seqlen_q=max_seqlen,

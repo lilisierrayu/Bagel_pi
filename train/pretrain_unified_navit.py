@@ -615,7 +615,7 @@ def main():
         if training_args.visual_und and data.get('vit_token_seqlens', None) is None:
             print('vit_token_seqlens is None, skipping this batch')
             continue
-        with torch.amp.autocast("cuda", enabled=True, dtype=torch.bfloat16):
+        with torch.amp.autocast("cuda", enabled=True, dtype=torch.float):
             if training_args.visual_gen:
                 with torch.no_grad():
                     padded_images = data.pop('padded_images')
@@ -736,7 +736,7 @@ def main():
                 logger=logger,
                 fsdp_config=fsdp_config,
                 data_status=gather_list,
-                save_bf16=True,
+                # save_bf16=True,
             )
 
     logger.info("Done!")

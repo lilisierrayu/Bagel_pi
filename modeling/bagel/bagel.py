@@ -1263,7 +1263,7 @@ class Bagel(PreTrainedModel):
             for k, v in generation_input.items():
                 if torch.is_tensor(v):
                     generation_input[k] = v.to(device)
-            with torch.amp.autocast("cuda", enabled=True, dtype=torch.bfloat16):
+            with torch.amp.autocast("cuda", enabled=True, dtype=torch.float):
                 past_key_values = self.forward_cache_update_vit(past_key_values, **generation_input)
 
         # add text
@@ -1277,7 +1277,7 @@ class Bagel(PreTrainedModel):
         for k, v in generation_input.items():
             if torch.is_tensor(v):
                 generation_input[k] = v.to(device)
-        with torch.amp.autocast("cuda", enabled=True, dtype=torch.bfloat16):
+        with torch.amp.autocast("cuda", enabled=True, dtype=torch.float):
             past_key_values = self.forward_cache_update_text(past_key_values, **generation_input)
 
         # decode
@@ -1285,7 +1285,7 @@ class Bagel(PreTrainedModel):
         for k, v in generation_input.items():
             if torch.is_tensor(v):
                 generation_input[k] = v.to(device)
-        with torch.amp.autocast("cuda", enabled=True, dtype=torch.bfloat16):
+        with torch.amp.autocast("cuda", enabled=True, dtype=torch.float):
             unpacked_latent = self.generate_text(
                 past_key_values=past_key_values,
                 max_length=max_length,
