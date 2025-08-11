@@ -159,7 +159,7 @@ if __name__ == "__main__":
     parser.add_argument('--num_timesteps', type=int, default=25)
     parser.add_argument('--use_vit_as_condition', action='store_true', help="Use ViT as condition (default: False)")
     parser.add_argument('--add_vit_as_condition', action='store_true', help="Add ViT as condition (default: False)")
-    parser.add_argument('--checkpoint_directory', type=str, default="/mnt/weka/checkpoints/liliyu/bagel_ckpt")
+    parser.add_argument('--checkpoint_directory', type=str, default="/mnt/weka/checkpoints/lucy/bagel_ckpt")
     args = parser.parse_args()
 
     seed = 42
@@ -188,7 +188,7 @@ if __name__ == "__main__":
         with_condition=args.with_condition,
     )
 
-    output_dir = os.path.join("/mnt/weka/checkpoints/liliyu/bagel_ckpt", args.run_name, "editing_eval", args.checkpoint_step)
+    output_dir = os.path.join("/mnt/weka/checkpoints/lucy/bagel_ckpt", args.run_name, "editing_eval", args.checkpoint_step)
 
     gen_suffix = (f"renorm{inference_hyper['cfg_renorm_min']}_"
                  f"text{inference_hyper['cfg_text_scale']}_"

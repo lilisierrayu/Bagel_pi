@@ -395,7 +395,7 @@ def main():
         
         # Scan with progress updates (without counting examples for speed)
         df = scan_results_directory_impl(
-            base_path="/mnt/weka/checkpoints/liliyu/bagel_ckpt",
+            base_path="/mnt/weka/checkpoints/lucy/bagel_ckpt",
             progress_callback=update_progress,
             count_examples=False  # Skip counting for speed
         )

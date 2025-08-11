@@ -152,7 +152,7 @@ if __name__ == "__main__":
     parser.add_argument('--cfg_text_scale', type=float, default=5.0)
     parser.add_argument('--cfg_img_scale', type=float, default=1.2)
     parser.add_argument('--num_timesteps', type=int, default=25)
-    parser.add_argument('--checkpoint_directory', type=str, default="/mnt/weka/checkpoints/liliyu/bagel_ckpt")
+    parser.add_argument('--checkpoint_directory', type=str, default="/mnt/weka/checkpoints/lucy/bagel_ckpt")
 
 
     args = parser.parse_args()
@@ -178,7 +178,7 @@ if __name__ == "__main__":
         image_shapes=(args.resolution, args.resolution),
     )
 
-    output_dir = os.path.join("/mnt/weka/checkpoints/liliyu/bagel_ckpt", args.run_name, "editing_eval", args.checkpoint_step)
+    output_dir = os.path.join("/mnt/weka/checkpoints/lucy/bagel_ckpt", args.run_name, "editing_eval", args.checkpoint_step)
 
     gen_suffix = (f"renorm{inference_hyper['cfg_renorm_min']}_"
                  f"text{inference_hyper['cfg_text_scale']}_"
