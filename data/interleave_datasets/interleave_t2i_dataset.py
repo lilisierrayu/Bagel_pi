@@ -22,6 +22,7 @@ class InterleavedBaseIterableDataset(DistributedIterableDataset):
 
     def _add_text(self, data, text, need_loss, enable_cfg=True):
         text_ids = self.tokenizer.encode(text)
+        assert not len(text_ids) < 0
         data['num_tokens'] += len(text_ids)
         data['text_ids_list'].append(text_ids)
         data['sequence_plan'].append(
@@ -37,7 +38,6 @@ class InterleavedBaseIterableDataset(DistributedIterableDataset):
 
     def _add_image(self, data, image, need_loss, need_vae, need_vit, enable_cfg=True):
         assert need_loss or need_vae or need_vit
-
         if need_loss:
             data['sequence_plan'].append(
                 {
@@ -88,9 +88,11 @@ class InterleavedBaseIterableDataset(DistributedIterableDataset):
         return data
 
     def _add_video(self, data, frames, frame_indexes, need_loss, need_vae, need_vit=False, enable_cfg=True):
-        assert int(need_loss) + int(need_vae) == 1
+        if not need_vit:
+            assert int(need_loss) + int(need_vae) == 1
 
         if need_loss:
+            # Add noisy images
             for idx, (image, frame_idx) in enumerate(zip(frames, frame_indexes)):
                 current_sequence_plan = {
                     'type': 'vae_image', 
@@ -150,7 +152,7 @@ class InterleavedBaseIterableDataset(DistributedIterableDataset):
         return data
 
     def save_example_image(self, condition_image, edited_image, edit_instruction, row_idx):
-        img_dir = os.path.join("results", self.experiment_name, f"{self.dataset_name}_examples")
+        img_dir = os.path.join("/mnt/weka/checkpoints/liliyu/bagel_ckpt", self.experiment_name, f"{self.dataset_name}_examples")
         os.makedirs(img_dir, exist_ok=True)
         condition_image = self.transform.resize_transform(condition_image)
         edited_image = self.transform.resize_transform(edited_image)
@@ -182,7 +184,7 @@ class InterleavedBaseIterableDataset(DistributedIterableDataset):
 
     def save_example_multi_image(self, condition_image_lists, edited_image_lists, edit_instruction, row_idx, image_key_list):
         
-        img_dir = os.path.join("results", self.experiment_name, f"{self.dataset_name}_examples")
+        img_dir = os.path.join("/mnt/weka/checkpoints/liliyu/bagel_ckpt", self.experiment_name, f"{self.dataset_name}_examples")
         os.makedirs(img_dir, exist_ok=True)
         with open(os.path.join(img_dir, f"example_{row_idx}_instruction.txt"), "w") as f:
             f.write(edit_instruction)

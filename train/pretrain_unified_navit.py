@@ -115,11 +115,11 @@ class ModelArguments:
         metadata={"help": "Probability of dropping text embeddings during training."}
     )
     vae_cond_dropout_prob: float = field(
-        default=0.3,
+        default=0.1,
         metadata={"help": "Probability of dropping VAE latent inputs during training."}
     )
     vit_cond_dropout_prob: float = field(
-        default=0.3,
+        default=0.4,
         metadata={"help": "Probability of dropping ViT visual features during training."}
     )
 
@@ -178,11 +178,11 @@ class TrainingArguments:
 
     # --- bookkeeping & logging ---
     exp_checkpoint_dir: str = field(
-        default="results",
+        default="/mnt/weka/checkpoints/liliyu/bagel_ckpt",
         metadata={"help": "Root directory for logs."}
     )
     checkpoint_dir: str = field(
-        default="results",
+        default="/mnt/weka/checkpoints/liliyu/bagel_ckpt",
         metadata={"help": "Root directory for model checkpoints."}
     )
     wandb_project: str = field(
@@ -518,9 +518,13 @@ def main():
 
 
     if dist.get_rank() == 0:
+        print("==================  fsdp_model setting ==================")
         print(fsdp_model)
         for name, param in model.named_parameters():
-            print(name, param.requires_grad)
+            print(name, param.requires_grad, param.dtype)
+        print("==================  vae_model setting ==================")
+        for name, param in vae_model.named_parameters():
+            print(name, param.requires_grad, param.dtype)
 
     # Setup optimizer and scheduler
     optimizer = torch.optim.AdamW(
@@ -603,7 +607,7 @@ def main():
         pin_memory=True,
         collate_fn=collate_wrapper(),
         drop_last=True,
-        prefetch_factor=data_args.prefetch_factor,
+        prefetch_factor=data_args.prefetch_factor if data_args.prefetch_factor > 0 else None,
     )
 
     # Prepare models for training:
@@ -621,6 +625,10 @@ def main():
         data = data.cuda(device).to_dict()
         data_indexes = data.pop('batch_data_indexes', None)
         ce_loss_weights = data.pop('ce_loss_weights', None)
+        
+        if training_args.visual_und and data.get('vit_token_seqlens', None) is None:
+            print('vit_token_seqlens is None, skipping this batch')
+            continue
         with torch.amp.autocast("cuda", enabled=True, dtype=torch.bfloat16):
             if training_args.visual_gen:
                 with torch.no_grad():
@@ -650,7 +658,7 @@ def main():
             loss_dict["ce"] = ce.detach()
             loss = loss + ce * training_args.ce_weight
         else:
-            assert not training_args.visual_und
+            # assert not training_args.visual_und
             loss_dict["ce"] = torch.tensor(0, device=device)
             total_ce_tokens = torch.tensor(0, device=device)
 
@@ -724,12 +732,13 @@ def main():
         #         if dataset.data_table is not None:
         #             wandb.log({"data_table": dataset.data_table})
 
-        if curr_step % training_args.save_every == 0:
+        if curr_step > 0 and curr_step % training_args.save_every == 0:
             if dist.get_rank() == 0:
                 gather_list = [None] * dist.get_world_size()
             else:
                 gather_list = None
-            dist.gather_object(data_status, gather_list, dst=0)
+            torch.cuda.empty_cache() 
+            dist.gather_object(data_status, gather_list)
 
             FSDPCheckpoint.fsdp_save_ckpt(
                 ckpt_dir=training_args.checkpoint_dir, 

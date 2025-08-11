@@ -1,14 +1,15 @@
 # Copyright 2025 Bytedance Ltd. and/or its affiliates.
 # SPDX-License-Identifier: Apache-2.0
 
-from .interleave_datasets import UnifiedEditIterableDataset, EditJSONLIterableDataset, PiEditIterableDataset, PiEditAllViewsIterableDataset
-from .t2i_dataset import T2IIterableDataset, T2IIWebDataset
+from .interleave_datasets import UnifiedEditIterableDataset, EditJSONLIterableDataset, PiEditIterableDataset, PiEditAllViewsIterableDataset, PiRobotQAAllViewsIterableDataset,PiT2IAllViewsIterableDataset, PiTextOnlyIterableDataset,PiWebQAIterableDataset, TextIterableDataset
+from .t2i_dataset import T2IIterableDataset, T2IIWebDataset, I2TIWebDataset
 from .vlm_dataset import SftJSONLIterableDataset
 
 
 DATASET_REGISTRY = {
     't2i_pretrain': T2IIterableDataset,
     'vlm_sft': SftJSONLIterableDataset,
+    'cambrian_sft': SftJSONLIterableDataset,
     'unified_edit': UnifiedEditIterableDataset,
     'simple_edit': EditJSONLIterableDataset,
     'sharded_edit': EditJSONLIterableDataset,
@@ -23,27 +24,72 @@ DATASET_REGISTRY = {
     'blip30_longcaption': T2IIWebDataset,
     'blip30_journeyDb': T2IIWebDataset,
     'blip30_shortcaption': T2IIWebDataset,
+    'blip30_longcaption_i2t': I2TIWebDataset,
+    'robot_caption': PiRobotQAAllViewsIterableDataset,
+    'robot_bbox': PiRobotQAAllViewsIterableDataset,
+    'pi_t2i_dataset': PiT2IAllViewsIterableDataset,
+    'pi_textonly': PiTextOnlyIterableDataset,
+    'textonly': TextIterableDataset,
+    'pi_webqa_dataset': PiWebQAIterableDataset,
 }
 
 
 DATASET_INFO = {
+    "robot_bbox": {
+        'robot_bbox': {
+            'data_dir': '/mnt/weka/liliyu/hf_data/SEED-Data-Edit-Part1-Openimages/auto_editing/openimages/images/',
+		},
+    },
+    "robot_caption": {
+        'robot_caption': {
+            'data_dir': '/mnt/weka/liliyu/hf_data/SEED-Data-Edit-Part1-Openimages/auto_editing/openimages/images/',
+		},
+    },
+    "pi_t2i_dataset": {
+        'pi_t2i': {
+            'data_dir': '/mnt/weka/liliyu/hf_data/SEED-Data-Edit-Part1-Openimages/auto_editing/openimages/images/',
+        },
+    },
+    "pi_textonly": {
+        'tulu_3': {
+            'data_dir': '/mnt/weka/liliyu/hf_data/SEED-Data-Edit-Part1-Openimages/auto_editing/openimages/images/',
+		},
+    },
+    'textonly':{
+        'tulu_3': {
+            'data_dir': '/mnt/weka/liliyu/hf_data/tulu-3-sft-mixture/sharded_data/',
+            'json_dir': '/mnt/weka/liliyu/hf_data/tulu-3-sft-mixture/sharded_data/', # information of the parquet files
+		},
+    },
+    "pi_webqa_dataset": {
+        'pi_webqa': {
+            'data_dir': '/mnt/weka/liliyu/hf_data/SEED-Data-Edit-Part1-Openimages/auto_editing/openimages/images/',
+		},
+    },
     'blip30_longcaption': {
         'blip30_longcaption': {
-            'data_dir': '/mnt/weka/checkpoints/hf_data/BLIP3o-Pretrain-Long-Caption/', # path of the parquet files
+            'data_dir': '/mnt/weka/liliyu/hf_data/BLIP3o-Pretrain-Long-Caption/', # path of the parquet files
+            # 'num_files': 10, # number of data units to be sharded across all ranks and workers
+            # 'num_total_samples': 1000, # number of total samples in the dataset
+        },
+    },
+    'blip30_longcaption_i2t': {
+        'blip30_longcaption_i2t': {
+            'data_dir': '/mnt/weka/liliyu/hf_data/BLIP3o-Pretrain-Long-Caption/', # path of the parquet files
             # 'num_files': 10, # number of data units to be sharded across all ranks and workers
             # 'num_total_samples': 1000, # number of total samples in the dataset
         },
     },
     'blip30_journeyDb': {
         'blip30_journeyDb': {
-            'data_dir': '/mnt/weka/checkpoints/hf_data/BLIP3o-Pretrain-JourneyDB/', # path of the parquet files
+            'data_dir': '/mnt/weka/liliyu/hf_data/BLIP3o-Pretrain-JourneyDB/', # path of the parquet files
             # 'num_files': 10, # number of data units to be sharded across all ranks and workers
             # 'num_total_samples': 1000, # number of total samples in the dataset
         },
     },
     'blip30_shortcaption': {
         'blip30_shortcaption': {
-            'data_dir': '/mnt/weka/checkpoints/hf_data/BLIP3o-Pretrain-Short-Caption/', # path of the parquet files
+            'data_dir': '/mnt/weka/liliyu/hf_data/BLIP3o-Pretrain-Short-Caption/', # path of the parquet files
             # 'num_files': 10, # number of data units to be sharded across all ranks and workers
             # 'num_total_samples': 1000, # number of total samples in the dataset
         },
@@ -65,65 +111,64 @@ DATASET_INFO = {
     },
     'sharded_edit':{
         'sharded_edit': {
-            'data_dir': '/mnt/weka/checkpoints/hf_data/SEED-Data-Edit-Part1-Openimages/auto_editing/openimages/images/',
-            'json_dir': '/mnt/weka/checkpoints/hf_data/SEED-Data-Edit-Part1-Openimages/auto_editing/openimages/annotations_GPT4V/', # information of the parquet files
+            'data_dir': '/mnt/weka/liliyu/hf_data/SEED-Data-Edit-Part1-Openimages/auto_editing/openimages/images/',
+            'json_dir': '/mnt/weka/liliyu/hf_data/SEED-Data-Edit-Part1-Openimages/auto_editing/openimages/annotations_GPT4V/', # information of the parquet files
 		},
-
     },
     'simple_edit':{
         'simple_edit': {
-            'data_dir': '/mnt/weka/checkpoints/hf_data/SEED-Data-Edit-Part1-Openimages/auto_editing/openimages/images/',
-            'json_dir': '/mnt/weka/checkpoints/hf_data/SEED-Data-Edit-Part1-Openimages/auto_editing/openimages/annotations_GPT4V/', # information of the parquet files
+            'data_dir': '/mnt/weka/liliyu/hf_data/SEED-Data-Edit-Part1-Openimages/auto_editing/openimages/images/',
+            'json_dir': '/mnt/weka/liliyu/hf_data/SEED-Data-Edit-Part1-Openimages/auto_editing/openimages/annotations_GPT4V/', # information of the parquet files
 		},
         'seed_part1': {
-            'data_dir': '/mnt/weka/checkpoints/hf_data/SEED-Data-Edit-Part1-Openimages/auto_editing/openimages/images/',
-            'json_dir': '/mnt/weka/checkpoints/hf_data/SEED-Data-Edit-Part1-Openimages/auto_editing/openimages/annotations_GPT4V/', # information of the parquet files
+            'data_dir': '/mnt/weka/liliyu/hf_data/SEED-Data-Edit-Part1-Openimages/auto_editing/openimages/images/',
+            'json_dir': '/mnt/weka/liliyu/hf_data/SEED-Data-Edit-Part1-Openimages/auto_editing/openimages/annotations_GPT4V/', # information of the parquet files
 		},
     },
     "pi_edit": {
         'pi_edit': {
-            'data_dir': '/mnt/weka/checkpoints/hf_data/SEED-Data-Edit-Part1-Openimages/auto_editing/openimages/images/',
+            'data_dir': '/mnt/weka/liliyu/hf_data/SEED-Data-Edit-Part1-Openimages/auto_editing/openimages/images/',
 		},
         'arx_endspan_448': {
-            'data_dir': '/mnt/weka/checkpoints/hf_data/SEED-Data-Edit-Part1-Openimages/auto_editing/openimages/images/',
+            'data_dir': '/mnt/weka/liliyu/hf_data/SEED-Data-Edit-Part1-Openimages/auto_editing/openimages/images/',
 		},
         'ur5_endspan_448': {
-            'data_dir': '/mnt/weka/checkpoints/hf_data/SEED-Data-Edit-Part1-Openimages/auto_editing/openimages/images/',
+            'data_dir': '/mnt/weka/liliyu/hf_data/SEED-Data-Edit-Part1-Openimages/auto_editing/openimages/images/',
 		},
     },
     "pi_edit2": {
         'ur5_endspan_448': {
-            'data_dir': '/mnt/weka/checkpoints/hf_data/SEED-Data-Edit-Part1-Openimages/auto_editing/openimages/images/',
+            'data_dir': '/mnt/weka/liliyu/hf_data/SEED-Data-Edit-Part1-Openimages/auto_editing/openimages/images/',
 		},
     },
     "pi_edit3": {
         'ur5_endspan_448': {
-            'data_dir': '/mnt/weka/checkpoints/hf_data/SEED-Data-Edit-Part1-Openimages/auto_editing/openimages/images/',
+            'data_dir': '/mnt/weka/liliyu/hf_data/SEED-Data-Edit-Part1-Openimages/auto_editing/openimages/images/',
 		},
     },
     "pi_edit_allviews": {
         'ur5_endspan_448': {
-            'data_dir': '/mnt/weka/checkpoints/hf_data/SEED-Data-Edit-Part1-Openimages/auto_editing/openimages/images/',
+            'data_dir': '/mnt/weka/liliyu/hf_data/SEED-Data-Edit-Part1-Openimages/auto_editing/openimages/images/',
 		},
     },
     "pi_edit_allviews1": {
         'ur5_endspan_448': {
-            'data_dir': '/mnt/weka/checkpoints/hf_data/SEED-Data-Edit-Part1-Openimages/auto_editing/openimages/images/',
+            'data_dir': '/mnt/weka/liliyu/hf_data/SEED-Data-Edit-Part1-Openimages/auto_editing/openimages/images/',
 		},
     },
     "pi_edit_allviews2": {
         'ur5_endspan_448': {
-            'data_dir': '/mnt/weka/checkpoints/hf_data/SEED-Data-Edit-Part1-Openimages/auto_editing/openimages/images/',
+            'data_dir': '/mnt/weka/liliyu/hf_data/SEED-Data-Edit-Part1-Openimages/auto_editing/openimages/images/',
 		},
     },
     "pi_edit_allviews3": {
         'ur5_endspan_448': {
-            'data_dir': '/mnt/weka/checkpoints/hf_data/SEED-Data-Edit-Part1-Openimages/auto_editing/openimages/images/',
+            'data_dir': '/mnt/weka/liliyu/hf_data/SEED-Data-Edit-Part1-Openimages/auto_editing/openimages/images/',
 		},
     },
     "pi_edit_allviews4": {
         'ur5_endspan_448': {
-            'data_dir': '/mnt/weka/checkpoints/hf_data/SEED-Data-Edit-Part1-Openimages/auto_editing/openimages/images/',
+            'data_dir': '/mnt/weka/liliyu/hf_data/SEED-Data-Edit-Part1-Openimages/auto_editing/openimages/images/',
 		},
     },
     'vlm_sft': {
@@ -131,6 +176,12 @@ DATASET_INFO = {
 			'data_dir': '/home/liliyu/workspace/BAGEL/example_data/bagel_example/vlm/images',
 			'jsonl_path': '/home/liliyu/workspace/BAGEL/example_data/bagel_example/vlm/llava_ov_si.jsonl',
 			'num_total_samples': 1000
+		},
+    },
+    'cambrian_sft': {
+        'cambrian_sft': {
+			'data_dir': '/mnt/weka/liliyu/hf_data/Cambrian-10M/images',
+			'jsonl_path': '/mnt/weka/liliyu/hf_data/Cambrian-10M/images/Cambrian7M.jsonl',
 		},
     },
 }

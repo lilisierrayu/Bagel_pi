@@ -15,6 +15,7 @@ from torch.distributed.fsdp import (
     BackwardPrefetch,
     ShardingStrategy,
     FullStateDictConfig,
+    ShardedStateDictConfig,
     StateDictType,
 )
 from torch.distributed.fsdp.wrap import transformer_auto_wrap_policy
@@ -99,6 +100,7 @@ class FSDPCheckpoint:
     ):
         save_path = os.path.join(ckpt_dir, f"{train_steps:07d}")
         os.makedirs(save_path, exist_ok=True)
+        os.makedirs(f"{save_path}_optimizer", exist_ok=True)
         logger.info(f"Saving checkpoint to {save_path}.")
 
         if ema_model is not None:
@@ -107,6 +109,7 @@ class FSDPCheckpoint:
                 StateDictType.FULL_STATE_DICT,
                 FullStateDictConfig(rank0_only=True, offload_to_cpu=True),
             ):
+                torch.cuda.empty_cache()          # right before state_dict()
                 ema_state_dict = ema_model.state_dict()
                 if save_bf16:
                     ema_state_dict = {k: v.to(torch.bfloat16) if v.dtype == torch.float32 else v for k, v in ema_state_dict.items()}
@@ -118,6 +121,7 @@ class FSDPCheckpoint:
             StateDictType.FULL_STATE_DICT,
             FullStateDictConfig(rank0_only=True, offload_to_cpu=True),
         ):
+            torch.cuda.empty_cache()    # right before state_dict()
             model_state_dict = model.state_dict()
             if save_bf16:
                 model_state_dict = {k: v.to(torch.bfloat16) if v.dtype == torch.float32 else v for k, v in model_state_dict.items()}
@@ -135,7 +139,7 @@ class FSDPCheckpoint:
                 raise NotImplementedError
 
             optimizer_save_path = os.path.join(
-                save_path, f"optimizer.{shard_index:05d}-of-{total_shards:05d}.pt"
+                f"{save_path}_optimizer", f"optimizer.{shard_index:05d}-of-{total_shards:05d}.pt"
             )
             if fsdp_config.sharding_strategy == "FULL_SHARD":
                 torch.save(optimizer.state_dict(), optimizer_save_path)
@@ -205,7 +209,7 @@ class FSDPCheckpoint:
                 raise NotImplementedError
 
             optimizer_state_dict_path = os.path.join(
-                resume_from, f"optimizer.{shard_index:05d}-of-{total_shards:05d}.pt"
+                f"{resume_from}_optimizer", f"optimizer.{shard_index:05d}-of-{total_shards:05d}.pt"
             )
             optimizer_state_dict = torch.load(optimizer_state_dict_path, map_location="cpu", weights_only=True)
             optimizer.load_state_dict(optimizer_state_dict)
