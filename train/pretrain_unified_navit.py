@@ -35,6 +35,16 @@ from train.fsdp_utils import (
     FSDPCheckpoint, FSDPConfig, grad_checkpoint_check_fn, fsdp_wrapper, 
     fsdp_ema_setup, fsdp_ema_update,
 )
+import signal
+import sys
+from typing import Any
+
+
+def handle_preemption(signum: int, frame: Any):
+    sys.exit(8)
+
+
+signal.signal(signal.SIGUSR2, handle_preemption)
 
 
 @dataclass

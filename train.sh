@@ -9,6 +9,7 @@
 #SBATCH --signal=USR2@90
 #SBATCH --wckey=submitit
 #SBATCH --job-name=bagel
+#SBATCH --qos=hl
 
 # Check if config name is provided
 if [ $# -eq 0 ]; then

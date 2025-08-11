@@ -37,7 +37,7 @@ import asyncio
 from msgpack_numpy import Packer, unpackb
 
 logger = logging.getLogger(__name__)
-PRETRAINED_PATH = "pretrained_models/BAGEL-7B-MoT"
+PRETRAINED_PATH = "/home/liliyu/workspace/BAGEL/pretrained_models/BAGEL-7B-MoT"
 model_path = PRETRAINED_PATH
 
 

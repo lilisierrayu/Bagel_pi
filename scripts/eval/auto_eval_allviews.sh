@@ -14,24 +14,24 @@ image_list_str="image_0,image_2,image_3"
 
 
 # exp_names=(
-#     arx_biarm_allview_shirt_folding_150steps_vfilter_gpu16_seq16384
+#     shirt_folding_vfilter_arx_biarm_ur5_100_200steps_sampling_gpu16_from_shirt_folding_vfilter_10k
 # )
 # task_name='shirt_folding_150steps_vfilter'
 
 # exp_names=(
-#     mobile_dishwasher_200steps_gpu16_from_pretrained_lr1e-5_10k
+#     mobile_dishwasher_100_200steps_sampling_gpu16_from_pretrained_10k
 # )
 # task_name='dishwasher_200steps'
 
-exp_names=(
-    arx_biarm_diverse_batch_200steps_gpu16_
-)
-task_name='diverse_batch_folding_step200'
-
 # exp_names=(
-#     mobile_all_3cam_200steps_gpu16_from_pretrained_20k
+#     arx_biarm_diverse_batch_200steps_gpu16_
 # )
-# task_name='mobile_all_3cam_200steps'
+# task_name='diverse_batch_folding_step200'
+
+exp_names=(
+    mobile_all_3cam_100_200steps_sampling_gpu16_from_pretrained_sampling_18k
+)
+task_name='mobile_all_3cam_200steps'
 
 # while true; do
 for mode in raw ema; do
