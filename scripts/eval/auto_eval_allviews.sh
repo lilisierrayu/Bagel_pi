@@ -28,20 +28,26 @@ image_list_str="image_0,image_2,image_3"
 # )
 # task_name='diverse_batch_folding_step200'
 
+# exp_names=(
+#     mobile_all_3cam_100_200steps_sampling_gpu16_from_pretrained_sampling_18k
+# )
+# task_name='mobile_all_3cam_200steps'
+
 exp_names=(
-    mobile_all_3cam_100_200steps_sampling_gpu16_from_pretrained_sampling_18k
+    mobile_dishwasher_single_stratey_100_200steps_sampling_hires_gpu16_from_pretrained_hires_30k
 )
-task_name='mobile_all_3cam_200steps'
+task_name='dishwasher_single_strategy_last_in_span'
 
 # while true; do
 for mode in raw ema; do
     # for task_name in "${task_names[@]}"; do
         for exp_name in "${exp_names[@]}"; do
-            if [[ $exp_name == *"448"* ]]; then
-                resolution=448
-            else
-                resolution=224
-            fi
+            # if [[ $exp_name == *"448"* ]]; then
+            #     resolution=448
+            # else
+            #     resolution=224
+            # fi
+            resolution=448
             for image_key in image_0 image_1 image_2; do 
                 echo ${exp_name}
                 exp_dir=${root_dir}/${exp_name}
