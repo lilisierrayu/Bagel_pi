@@ -53,6 +53,9 @@ for mode in raw ema; do
                 exp_dir=${root_dir}/${exp_name}
                 ckpt_dir=${exp_dir}/checkpoints/*
                 for d in ${ckpt_dir}; do
+                    if [[ "$d" == *"optimizer"* ]]; then
+                        continue
+                    fi
                     echo ${d}
                     ckpt=$(basename ${d})
                     # # Edit images
