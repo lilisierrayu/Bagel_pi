@@ -1,11 +1,11 @@
 #!/bin/bash
 #SBATCH --cpus-per-task=11
-#SBATCH --error=/mnt/weka/slurm_logs/lucy/img_edit_train/%j_%a_log.err
+#SBATCH --error=/mnt/pi-data/slurm_logs/lucy/img_edit_train/%j_%a_log.err
 #SBATCH --gres=gpu:8
 #SBATCH --nodes=2
 #SBATCH --ntasks-per-node=1
 #SBATCH --open-mode=append
-#SBATCH --output=/mnt/weka/slurm_logs/lucy/img_edit_train/%j_%a_log.out
+#SBATCH --output=/mnt/pi-data/slurm_logs/lucy/img_edit_train/%j_%a_log.out
 #SBATCH --signal=USR2@90
 #SBATCH --wckey=submitit
 #SBATCH --job-name=bagel
@@ -24,7 +24,7 @@ config_name=$1
 # Rename the job to use the config name
 scontrol update job $SLURM_JOB_ID name=bagel_$config_name
 
-cd /home/lucy/Bagel_pi
+cd /mnt/pi-home/home/lucy/Bagel_pi
 source .venv/bin/activate
 
 # replace the variables with your own
@@ -33,15 +33,15 @@ num_nodes=$SLURM_NNODES
 node_rank=$SLURM_NODEID
 master_addr=localhost
 master_port=29515
-model_path=/home/liliyu/workspace/BAGEL/pretrained_models/BAGEL-7B-MoT
-resume_from=/mnt/weka/checkpoints/liliyu/bagel_ckpt/pre09_seed_blip3o_robot_448px_t1.0_gpu16_seq32768_shard8__PRE02_16k/checkpoints/0030000
+model_path=/mnt/pi-data/public_weights/BAGEL-7B-MoT
+resume_from=/mnt/weka/checkpoints/liliyu/bagel_ckpt/pre10_seed_blip3o_robot_448px__PRE06_20k_t1.0_gpu16_seq32768_shard8/checkpoints/0130000
 ckpt_dir=/mnt/weka/checkpoints/lucy/bagel_ckpt/
 GPUS=8
-note="from_pretrained_hires_30k_2"
+note="from_pretrained_hires_13k"
 
 batch_size=1
 seq_len=16384
-export PYTHONPATH=/home/lucy/Bagel_pi
+export PYTHONPATH=/mnt/pi-home/home/lucy/Bagel_pi
 total_gpus=$((num_nodes * GPUS))
 
 # Fine-tuning
