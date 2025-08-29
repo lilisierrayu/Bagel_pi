@@ -1,0 +1,61 @@
+# Copyright 2025 Bytedance Ltd. and/or its affiliates.
+# SPDX-License-Identifier: Apache-2.0
+
+# replace the variables with your own
+# Fine-tuning
+
+if [ $# -eq 0 ]; then
+    echo "Usage: $0 <config_name>"
+    echo "Example: $0 seedp1_0.2_arx_biarm_allview_endspan"
+    exit 1
+fi
+config_name=$1
+
+num_nodes=1
+node_rank=0
+master_addr=localhost
+master_port=29500
+# model_path=/home/liliyu/workspace/BAGEL/pretrained_models/BAGEL-7B-MoT
+model_path=/home/liliyu/workspace/BAGEL/pretrained_models/BAGEL-small-fake
+  # --resume-from $model_path \
+# resume_from=$model_path
+resume_from=None
+GPUS=8
+
+
+batch_size=1
+seq_len=10240
+  # --resume-from $resume_from \
+  # --visual_und False \
+# Fine-tuning
+PYTHONPATH=. torchrun \
+  --nnodes=$num_nodes \
+  --node_rank=$node_rank \
+  --nproc_per_node=$GPUS \
+  --master_addr=$master_addr \
+  --master_port=$master_port \
+  train/pretrain_unified_navit.py \
+  --dataset_config_file data/configs/${config_name}.yaml  \
+  --model_path $model_path \
+  --resume-from $resume_from \
+  --layer_module Qwen2MoTDecoderLayer \
+  --max_latent_size 64 \
+  --finetune_from_hf True \
+  --auto_resume True \
+  --resume-model-only True \
+  --exp-checkpoint-dir /mnt/weka/checkpoints/liliyu/debug_bagel \
+  --finetune-from-ema True \
+  --log_every 1 \
+  --lr 2e-5 \
+  --num_worker 0 \
+  --prefetch_factor 0 \
+  --expected_num_tokens $seq_len \
+  --max_num_tokens $seq_len \
+  --max_num_tokens_per_sample $seq_len \
+  --batch_size $batch_size \
+  --exp_name ${config_name}_data \
+  --wandb_runid 2 \
+  --num_shard $GPUS \
+  --visual_und False  \
+  --save_every 2
+
