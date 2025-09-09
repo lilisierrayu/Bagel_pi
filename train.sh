@@ -9,7 +9,6 @@
 #SBATCH --signal=USR2@90
 #SBATCH --wckey=submitit
 #SBATCH --job-name=bagel
-#SBATCH --qos=hl
 
 # Check if config name is provided
 if [ $# -eq 0 ]; then
@@ -37,7 +36,7 @@ model_path=/mnt/pi-data/public_weights/BAGEL-7B-MoT
 resume_from=/mnt/weka/checkpoints/liliyu/bagel_ckpt/pre10_seed_blip3o_robot_448px__PRE06_20k_t1.0_gpu16_seq32768_shard8/checkpoints/0130000
 ckpt_dir=/mnt/weka/checkpoints/lucy/bagel_ckpt/
 GPUS=8
-note="from_pretrained_hires_13k"
+note="from_pretrained_hires_13k_4"
 
 batch_size=1
 seq_len=16384
