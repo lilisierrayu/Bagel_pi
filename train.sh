@@ -1,11 +1,12 @@
 #!/bin/bash
 #SBATCH --cpus-per-task=11
-#SBATCH --error=/mnt/pi-data/slurm_logs/lucy/img_edit_train/%j_%a_log.err
+#SBATCH --error=/mnt/pi-data/slurm_logs/lucyshi/img_edit_train/%j_%a_log.err
 #SBATCH --gres=gpu:8
 #SBATCH --nodes=2
 #SBATCH --ntasks-per-node=1
+#SBATCH --qos=tmp_wm
 #SBATCH --open-mode=append
-#SBATCH --output=/mnt/pi-data/slurm_logs/lucy/img_edit_train/%j_%a_log.out
+#SBATCH --output=/mnt/pi-data/slurm_logs/lucyshi/img_edit_train/%j_%a_log.out
 #SBATCH --signal=USR2@90
 #SBATCH --wckey=submitit
 #SBATCH --job-name=bagel
@@ -23,7 +24,7 @@ config_name=$1
 # Rename the job to use the config name
 scontrol update job $SLURM_JOB_ID name=bagel_$config_name
 
-cd /mnt/pi-home/home/lucy/Bagel_pi
+cd /mnt/pi-home/home/lucyshi/Bagel_pi
 source .venv/bin/activate
 
 # replace the variables with your own
@@ -40,7 +41,7 @@ note=""
 
 batch_size=1
 seq_len=16384
-export PYTHONPATH=/mnt/pi-home/home/lucy/Bagel_pi
+export PYTHONPATH=/mnt/pi-home/home/lucyshi/Bagel_pi
 total_gpus=$((num_nodes * GPUS))
 
 # Fine-tuning
