@@ -20,7 +20,7 @@ pi_edit_allviews:
   dataset_names:
   - shirt_bus_seed_224  # Set pi data name for tracking
   pi_config_name: monopi.model.configs.release.bagel_pretrain_oct2.finetuning_configs:bagel_image_gen_shirtbus  # Set pi data here 
-  image_keys: "image_0,image_2"
+  image_keys: "image_0,image_2,image_3"
   image_transform_args:
     image_stride: 16
     max_image_size: 224

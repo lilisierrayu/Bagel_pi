@@ -2,9 +2,8 @@
 #SBATCH --cpus-per-task=11
 #SBATCH --error=/mnt/pi-data/slurm_logs/lucyshi/img_edit_train/%j_%a_log.err
 #SBATCH --gres=gpu:8
-#SBATCH --nodes=2
+#SBATCH --nodes=4
 #SBATCH --ntasks-per-node=1
-#SBATCH --qos=tmp_wm
 #SBATCH --open-mode=append
 #SBATCH --output=/mnt/pi-data/slurm_logs/lucyshi/img_edit_train/%j_%a_log.out
 #SBATCH --signal=USR2@90
